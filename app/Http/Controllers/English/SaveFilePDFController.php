@@ -4,11 +4,11 @@ namespace App\Http\Controllers\English;
 
 use App\Http\Controllers\Controller;
 use App\Models\English\RequestReading;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use League\CommonMark\CommonMarkConverter;
 use Spatie\Browsershot\Browsershot;
-use Spatie\LaravelPdf\Facades\Pdf;
 
 class SaveFilePDFController extends Controller
 {
@@ -35,18 +35,13 @@ class SaveFilePDFController extends Controller
                     'choices' => $value->choices,
                 ];
             });
-            Browsershot::html('<h1>Hello world!!</h1>')->save('example.pdf');
-//            $pdf = Pdf::view(self::PATH_VIEW . __FUNCTION__,
-//                compact(['convertedParagraph', 'quiz']))
-//                ->save(public_path('reading/' . $getReading['topic'] . '.pdf'));
-//
+            return Pdf::loadView(self::PATH_VIEW . __FUNCTION__, compact(['convertedParagraph', 'quiz']))->download();
 ////        return view(self::PATH_VIEW.__FUNCTION__,compact(['convertedParagraph','quiz']));
-//            return $pdf->stream('invoice.pdf');
         } catch (\Exception $e) {
             return response()->json([
-                'errors'=>$e->getMessage(),
-                'status'=>500
-            ],500);
+                'errors' => $e->getMessage(),
+                'status' => 500
+            ], 500);
         }
     }
 }
