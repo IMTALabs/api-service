@@ -14,7 +14,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+Route::prefix('english')->group(base_path('routes/api/english.php'));
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('/english/reading/save_pdf',[\App\Http\Controllers\English\SaveFilePDFController::class,'reading']);
