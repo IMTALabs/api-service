@@ -10,7 +10,7 @@
                         Created by:
                     </dt>
                     <dd class="text-gray-800 dark:text-gray-200">
-                        <a class="inline-flex items-center gap-x-1.5 text-blue-600 decoration-2 hover:underline font-medium"
+                        <a class="inline-flex items-center gap-x-1.5 text-green-600 decoration-2 hover:underline font-medium"
                            href="mailto:{{ $reading->user->email }}">
                             {{ $reading->user->full_name }}
                         </a>
@@ -76,8 +76,8 @@
                         @foreach($question['choices'] as $key => $choice)
                             <div class="flex gap-x-3">
                                 <input id="push-everything"
-                                       name="push-notifications" type="radio"
-                                       class="h-4 w-4 mt-1 border-gray-300 text-indigo-600 focus:ring-indigo-600 shrink-0">
+                                       name="question-{{ $loop->parent->index + 1 }}" type="radio"
+                                       class="h-4 w-4 mt-1 border-gray-300 text-indigo-600 focus:ring-indigo-600 shrink-0 accent-green-600">
                                 <label for="push-everything"
                                        class="block text-sm font-medium leading-6 text-gray-900">
                                     {{ $key }}.

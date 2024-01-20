@@ -9,12 +9,13 @@
 
     @vite('resources/css/app.css')
 </head>
-<body>
+<body class="bg-[url('https://res.cloudinary.com/dyxp9ndma/image/upload/c_scale,w_768/v1705746651/welcome_little_one_fscpaf.png')]">
     <!-- Invoice -->
     <div class="max-w-[85rem] px-4 sm:px-6 lg:px-8 mx-auto my-4 sm:my-10">
         <!-- Grid -->
         <div class="mb-5 pb-5 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
-            <div>
+            <div class="flex items-center gap-1">
+                <img class="w-12 h-12" src="https://3dicons.sgp1.cdn.digitaloceanspaces.com/v1/dynamic/premium/fire-dynamic-premium.png" alt="">
                 <h2 class="text-2xl font-semibold text-gray-800 dark:text-gray-200">Reading Test</h2>
             </div>
             <!-- Col -->
