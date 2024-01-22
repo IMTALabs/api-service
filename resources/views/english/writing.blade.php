@@ -11,8 +11,8 @@
                     </dt>
                     <dd class="text-gray-800 dark:text-gray-200">
                         <a class="inline-flex items-center gap-x-1.5 text-green-600 decoration-2 hover:underline font-medium"
-                           href="mailto:{{ $reading->user->email }}">
-                            {{ $reading->user->full_name }}
+                           href="mailto:{{ $reading->email }}">
+                            {{ $reading->full_name }}
                         </a>
                     </dd>
                 </dl>
@@ -37,7 +37,7 @@
                         Created date:
                     </dt>
                     <dd class="font-medium text-gray-800 dark:text-gray-200">
-                        {{ $reading->created_at->format('Y/m/d') }}
+                        {{ \Carbon\Carbon::parse($reading->created_at)->format('Y/m/d') }}
                     </dd>
                 </dl>
 
@@ -57,38 +57,17 @@
             class="mt-8 border border-gray-200 col-span-full p-4 rounded-lg relative text-justify">
             <span
                 class="absolute -top-3 left-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                Paragraph
+                Prompt
             </span>
-            {!! $reading->response['paragraph'] !!}
+            {!! $reading->response !!}
         </div>
-
-        @foreach($reading->response['form'] as $question)
-            <div
-                class="mt-4 border border-gray-200 col-span-full p-4 rounded-lg relative">
-                <span
-                    class="absolute -top-3 left-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                    Question {{ $loop->index + 1 }}
-                </span>
-                <fieldset>
-                    <legend
-                        class="text-sm font-semibold leading-6 text-gray-900">{{ $question['question'] }}</legend>
-                    <div class="mt-3 space-y-3">
-                        @foreach($question['choices'] as $key => $choice)
-                            <div class="flex gap-x-3">
-                                <input id="push-everything"
-                                       name="question-{{ $loop->parent->index + 1 }}" type="radio"
-                                       class="h-4 w-4 mt-1 border-gray-300 text-indigo-600 focus:ring-indigo-600 shrink-0 accent-green-600">
-                                <label for="push-everything"
-                                       class="block text-sm font-medium leading-6 text-gray-900">
-                                    {{ $key }}.
-                                    {{ $choice }}
-                                </label>
-                            </div>
-                        @endforeach
-                    </div>
-                </fieldset>
-            </div>
-        @endforeach
+        <div
+            class="mt-8 border border-gray-200 col-span-full p-4 rounded-lg relative text-justify h-screen">
+            <span
+                class="absolute -top-3 left-4 inline-flex items-center rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
+                Your paragraph
+            </span>
+        </div>
     </div>
     <!-- End Grid -->
 @endsection
