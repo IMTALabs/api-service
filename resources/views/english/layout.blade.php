@@ -48,9 +48,9 @@
 </head>
 
 <body
-    class="bg-[url('https://res.cloudinary.com/dyxp9ndma/image/upload/c_scale,w_768/v1705746651/welcome_little_one_fscpaf.png')] min-h-screen">
+    class="bg-[url('https://res.cloudinary.com/dyxp9ndma/image/upload/c_scale,w_768/v1705746651/welcome_little_one_fscpaf.png')] min-h-screen h-screen py-4 sm:py-10">
     <!-- Invoice -->
-    <div class="max-w-[85rem] px-4 sm:px-6 lg:px-8 mx-auto my-4 sm:my-10">
+    <div class="max-w-[85rem] px-4 sm:px-6 lg:px-8 mx-auto h-full flex flex-col">
         <!-- Grid -->
         <div class="mb-5 pb-5 flex justify-between items-center border-b border-gray-200 dark:border-gray-700">
             <div class="flex items-center gap-1">

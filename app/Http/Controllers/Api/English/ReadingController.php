@@ -84,21 +84,21 @@ class ReadingController extends Controller
                 ->select('writing_request.*', 'users.full_name', 'users.email')
                 ->first();
             // dd($reading);
-            $pdfPath = storage_path('app/pdf/' . $hash . '.pdf');
+            // $pdfPath = storage_path('app/pdf/' . $hash . '.pdf');
             // dd($pdfPath);    
             // $reading->export_pdf = $pdfPath;
             // $reading->save();
             $title='Writing test';
-            return view('english.writing', compact(['reading', 'title']));
+            // return view('english.writing', compact(['reading', 'title']));
             return \Spatie\LaravelPdf\Facades\Pdf::view('english.writing', compact(['reading', 'title']))
                 ->withBrowsershot(function (\Spatie\Browsershot\Browsershot $browsershot) {
-                    $browsershot->setIncludePath('C:/Users/HI/OneDrive/Desktop/CongViec/api-service/node/bin')
-                        ->setChromePath('C:/Users/HI/OneDrive/Desktop/CongViec/api-service/chrome-win/chrome')
+                    $browsershot->setIncludePath('/var/www/html/api-service/node/bin')
+                        ->setChromePath('/var/www/html/api-service/chrome-linux/chrome')
                         ->noSandbox();
                 })
                 ->format('a4')
                 ->margins(20, 0, 20, 0, Unit::Pixel)
-                ->save($pdfPath);
+                ->save('test.pdf');
         } catch (\Exception $e) {
             return response()->json([
                 'errors' => $e->getMessage(),
