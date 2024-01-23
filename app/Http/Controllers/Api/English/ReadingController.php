@@ -20,7 +20,7 @@ class ReadingController extends Controller
 
             $hash = $request->query('hash');
             $reading = \App\Models\ReadingRequest::with('user')->where('hash', $hash)->first();
-            $pdfPath = storage_path('app/pdf/' . $hash . '.pdf');
+            $pdfPath = $hash . '.pdf';
             // dd($pdfPath);
             $reading->export_pdf = $pdfPath;
             $reading->save();
@@ -33,7 +33,7 @@ class ReadingController extends Controller
                 })
                 ->format('a4')
                 ->margins(20, 0, 20, 0, Unit::Pixel)
-                ->save($pdfPath);
+                ->download($pdfPath);
         } catch (\Exception $e) {
             return response()->json([
                 'errors' => $e->getMessage(),
@@ -54,7 +54,7 @@ class ReadingController extends Controller
             ->first();
         // dd($reading);
         $data = json_decode($reading->response, true);
-        $pdfPath = storage_path('app/pdf/' . $hash . '.pdf');
+        $pdfPath = $hash . '.pdf';
         $title = 'Listening test';
         // dd($pdfPath);
         // $reading->export_pdf = $pdfPath;
@@ -67,7 +67,7 @@ class ReadingController extends Controller
             })
             ->format('a4')
             ->margins(20, 0, 20, 0, Unit::Pixel)
-            ->save($pdfPath);
+            ->download($pdfPath);
         // } catch (\Exception $e) {
         //     return response()->json([
         //         'errors' => $e->getMessage(),
@@ -87,7 +87,7 @@ class ReadingController extends Controller
                 ->select('writing_request.*', 'users.full_name', 'users.email')
                 ->first();
             // dd($reading);
-            $pdfPath = storage_path('app/pdf/' . $hash . '.pdf');
+            $pdfPath = $hash . '.pdf';
             // dd($pdfPath);    
             // $reading->export_pdf = $pdfPath;
             // $reading->save();
@@ -95,13 +95,13 @@ class ReadingController extends Controller
             // return view('english.writing', compact(['reading', 'title']));
             return \Spatie\LaravelPdf\Facades\Pdf::view('english.writing', compact(['reading', 'title']))
                 ->withBrowsershot(function (\Spatie\Browsershot\Browsershot $browsershot) {
-                    $browsershot->setIncludePath('C:/Users/HI/OneDrive/Desktop/CongViec/api-service/node/bin')
-                        ->setChromePath('C:/Users/HI/OneDrive/Desktop/CongViec/api-service/chrome-win/chrome')
+                    $browsershot->setIncludePath('/var/www/html/api-service/node/bin')
+                        ->setChromePath('/var/www/html/api-service/chrome-linux/chrome')
                         ->noSandbox();
                 })
                 ->format('a4')
                 ->margins(20, 0, 20, 0, Unit::Pixel)
-                ->save($pdfPath);
+                ->download($pdfPath);
         } catch (\Exception $e) {
             return response()->json([
                 'errors' => $e->getMessage(),
