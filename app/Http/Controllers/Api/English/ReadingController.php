@@ -25,7 +25,7 @@ class ReadingController extends Controller
             $reading->export_pdf = $pdfPath;
             $reading->save();
             $title = 'Reading test';
-            return \Spatie\LaravelPdf\Facades\Pdf::view('english.reading', compact(['reading','title']))
+            return \Spatie\LaravelPdf\Facades\Pdf::view('english.reading', compact(['reading', 'title']))
                 ->withBrowsershot(function (\Spatie\Browsershot\Browsershot $browsershot) {
                     $browsershot->setIncludePath('C:/Users/HI/OneDrive/Desktop/CongViec/api-service/node/bin')
                         ->setChromePath('C:/Users/HI/OneDrive/Desktop/CongViec/api-service/chrome-win/chrome')
@@ -49,6 +49,7 @@ class ReadingController extends Controller
 
         $reading = DB::table('listening_request')
             ->join('users', 'users.id', '=', 'listening_request.user_id')
+            ->where('listening_request.hash', $hash)
             ->select('listening_request.*', 'users.full_name', 'users.email')
             ->first();
         // dd($reading);
@@ -82,6 +83,7 @@ class ReadingController extends Controller
 
             $reading = DB::table('writing_request')
                 ->join('users', 'users.id', '=', 'writing_request.user_id')
+                ->where('writing_request.hash', $hash)
                 ->select('writing_request.*', 'users.full_name', 'users.email')
                 ->first();
             // dd($reading);
