@@ -18,7 +18,7 @@ Route::get('/', function () {
 
     // dd(Process::run('PATH=$PATH:/usr/local/bin:/opt/homebrew/bin NODE_PATH=`/home/quanph/.nvm/versions/node/v18.19.0/bin/node /home/quanph/.nvm/versions/node/v18.19.0/bin/npm root -g` /home/quanph/.nvm/versions/node/v18.19.0/bin/node -v')->errorOutput());
 
-    $reading = \App\Models\ReadingRequest::with('user')->first();
+    $reading = \App\Models\English\ReadingRequest::with('user')->first();
 
     return view('english.reading', compact('reading'));
 
@@ -37,7 +37,7 @@ Route::get('/', function () {
 });
 
 Route::get('/test', function () {
-    $reading = \App\Models\ReadingRequest::with('user')->first();
+    $reading = \App\Models\English\ReadingRequest::with('user')->first();
 
     // dump(Process::run('which node')->errorOutput());
     // dd(Process::run('which node')->output());
