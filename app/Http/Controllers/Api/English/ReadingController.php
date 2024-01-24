@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Enums\Unit;
 use Spatie\LaravelPdf\Facades\Pdf;
+use App\Traits\SlackNotifiable;
 
 class ReadingController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, SlackNotifiable;
 
     public function download(Request $request)
     {
@@ -21,6 +22,7 @@ class ReadingController extends Controller
             $hash = $request->query('hash');
             $reading = ReadingRequest::with('user')->where('hash', $hash)->first();
             if (!$reading) {
+                $this->slackNotify('Reading test ' . $hash . ' not found', 'backend');
                 return $this->responseNotFound(__('Reading test not found'));
             }
 
@@ -35,6 +37,7 @@ class ReadingController extends Controller
                 ->margins(20, 0, 20, 0, Unit::Pixel)
                 ->download($hash . '.pdf');
         } catch (\Exception $e) {
+            $this->slackNotify($e->getMessage(), 'backend');
             return $this->responseServerError($e->getMessage(), $e->getMessage());
         }
     }
