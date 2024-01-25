@@ -1,4 +1,4 @@
-@extends('english.layout')
+{{-- @extends('english.layout')
 
 @section('content')
     <!-- Grid -->
@@ -91,4 +91,4 @@
         @endforeach
     </div>
     <!-- End Grid -->
-@endsection
+@endsection --}}
