@@ -18,11 +18,11 @@ class VerifyAccessKey
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Request must have x-access-key header, and it must be equal to the value of ACCESS_KEY
-        if ($request->hasHeader('x-access-key') && $request->header('x-access-key') === config('app.access_key')) {
+        // // Request must have x-access-key header, and it must be equal to the value of ACCESS_KEY
+        // if ($request->hasHeader('x-access-key') && $request->header('x-access-key') === config('app.access_key')) {
             return $next($request);
-        }
+        // }
 
-        return $this->responseUnAuthorized('Invalid access key');
+        // return $this->responseUnAuthorized('Invalid access key');
     }
 }

@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Api\English\WritingController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,3 +19,5 @@ Route::prefix('english')->group(base_path('routes/api/english.php'));
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+// namespace App\Http\Controllers\Api\English;
+Route::get('/getTest',[WritingController::class, 'gettest'] );
