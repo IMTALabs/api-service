@@ -52,6 +52,7 @@ class ReadingController extends Controller
                 ->select('listening_request.*', 'users.full_name', 'users.email')
                 ->first();
             if (!$reading) {
+                $this->slackNotify('Listening test download pdf with ' . $hash . ' not found', 'backend');
                 return $this->responseNotFound(__('Listening test not found'));
             }
 
@@ -68,6 +69,7 @@ class ReadingController extends Controller
                 ->margins(20, 0, 20, 0, Unit::Pixel)
                 ->download($pdfPath);
         } catch (\Exception $e) {
+            $this->slackNotify($e->getMessage(), 'backend');
             return $this->responseServerError($e->getMessage(), $e->getMessage());
         }
     }
@@ -82,7 +84,10 @@ class ReadingController extends Controller
                 ->where('writing_request.hash', $hash)
                 ->select('writing_request.*', 'users.full_name', 'users.email')
                 ->first();
-
+            if (!$reading) {
+                $this->slackNotify('Writing test download pdf with ' . $hash . ' not found', 'backend');
+                return $this->responseNotFound(__('Listening test not found'));
+            }
             $pdfPath = $hash . '.pdf';
             $title = __('Writing test');
             return Pdf::view('english.writing', compact(['reading', 'title']))
@@ -95,6 +100,7 @@ class ReadingController extends Controller
                 ->margins(20, 0, 20, 0, Unit::Pixel)
                 ->download($pdfPath);
         } catch (\Exception $e) {
+            $this->slackNotify($e->getMessage(), 'backend');
             return $this->responseServerError($e->getMessage(), $e->getMessage());
         }
     }
