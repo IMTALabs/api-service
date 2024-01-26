@@ -11,10 +11,10 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::prefix('reading')->group(function () {
-    Route::post('/gen_topic', [ReadingController::class, 'genTopic']);
-    Route::post('', [ReadingController::class, 'reading']);
-    Route::post('/mark', [ReadingController::class, 'submitReading']);
-    Route::get('/{hash}', [ReadingController::class, 'readingTest']);
+    Route::post('/gen_topic', [ReadingController::class, 'genTopic'])->name('reading.genTopic');
+    Route::post('', [ReadingController::class, 'reading'])->name('reading.reading');
+    Route::post('/mark', [ReadingController::class, 'submitReading'])->name('reading.submitReading');
+    Route::get('/{hash}', [ReadingController::class, 'readingTest'])->name('reading.readingTest');
     // Route::get('download', [ReadingController::class, 'download'])->name('english.reading.download');
 });
 

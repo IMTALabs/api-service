@@ -5,13 +5,11 @@ namespace App\Http\Controllers\Api\English;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\English\HistoryUserEnglishResource;
 use App\Http\Resources\English\ReadingRequestResource;
-use App\Models\Accounting;
 use App\Models\HistoryUserEnglish;
 use App\Models\ListenMark;
 use App\Models\Reading;
 use Essa\APIToolKit\Api\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -49,9 +47,9 @@ class ReadingController extends Controller
                         'Content-Type' => 'application/json',
                         'x-api-key' => 'ezcS3JyK7NKCV0DkKwG4hqjy65TGnJ64nBB72qnSkNrxaJ3XAf'
                     ])->timeout(120)->post('https://8200.imta-chatbot.online/gen_article', [
-                                'id' => (string) $user_id,
-                                'topic' => $topic,
-                            ]);
+                        'id' => (string) $user_id,
+                        'topic' => $topic,
+                    ]);
                     $statusCode1 = $response1->getStatusCode();
                     $body1 = json_decode($response1->getBody(), true);
                     if ($statusCode1 == 200) {
@@ -77,8 +75,6 @@ class ReadingController extends Controller
                         'body' => $body,
                     ], 500);
                 }
-                //                dd($paragraph);
-
             }
             try {
                 $response = Http::withHeaders([
@@ -86,13 +82,12 @@ class ReadingController extends Controller
                     'Content-Type' => 'application/json',
                     'x-api-key' => 'ezcS3JyK7NKCV0DkKwG4hqjy65TGnJ64nBB72qnSkNrxaJ3XAf'
                 ])->timeout(120)->post('https://8200.imta-chatbot.online/gen_quizz', [
-                            'id' => (string) $user_id,
-                            'mode' => 'no_gen_topic',
-                            'topic' => $topic,
-                            'paragraph' => $paragraph,
-                            'num_quizz' => 10
-                        ]);
-
+                    'id' => (string) $user_id,
+                    'mode' => 'no_gen_topic',
+                    'topic' => $topic,
+                    'paragraph' => $paragraph,
+                    'num_quizz' => 10
+                ]);
 
                 // Lấy mã trạng thái của response
                 $statusCode = $response->getStatusCode();
@@ -130,7 +125,6 @@ class ReadingController extends Controller
                     $paragraph = trim($paragraph, '"');
                     $paragraph = Str::replace('\n', "\n", $paragraph);
                     $convertedParagraph = $converter->convert($paragraph);
-                    dd(2);
                     // Hiển thị nội dung để kiểm tra
                     return response()->json([
                         'data' => [
@@ -187,9 +181,9 @@ class ReadingController extends Controller
                     'Content-Type' => 'application/json',
                     'x-api-key' => 'ezcS3JyK7NKCV0DkKwG4hqjy65TGnJ64nBB72qnSkNrxaJ3XAf'
                 ])->timeout(120)->post('https://8200.imta-chatbot.online/gen_article', [
-                            'id' => (string) $user_id,
-                            'topic' => $topic,
-                        ]);
+                    'id' => (string) $user_id,
+                    'topic' => $topic,
+                ]);
                 $statusCode = $response->getStatusCode();
                 $body = json_decode($response->getBody(), true);
                 if ($statusCode == 200) {
@@ -255,7 +249,7 @@ class ReadingController extends Controller
                     ];
                 });
 
-                $point = $results->pluck('is_correct')->filter(fn($is_correct) => $is_correct)->count();
+                $point = $results->pluck('is_correct')->filter(fn ($is_correct) => $is_correct)->count();
                 $markListening = ListenMark::create([
                     'user_id' => $user_id,
                     'skill' => Reading::class,
@@ -294,7 +288,6 @@ class ReadingController extends Controller
             ]);
             return $this->responseNotFound(null, 'Không tìm thấy bài đọc');
         }
-
         return $this->responseSuccess(null, new ReadingRequestResource($reading));
     }
 }
