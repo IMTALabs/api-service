@@ -6,26 +6,19 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\English\HistoryUserEnglishResource;
 use App\Http\Resources\English\WritingRequestResource;
 use App\Models\HistoryUserEnglish;
-use App\Models\Listening;
 use App\Models\ListenMark;
 use App\Models\Writing;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use App\Models\Accounting;
-use Illuminate\Http\JsonResponse;
 use Essa\APIToolKit\Api\ApiResponse;
 
 class WritingController extends Controller
-{       
+{
     use ApiResponse;
 
-    public function gettest(){
-        return "hello";
-    }
     public function writing_gen_instruction(Request $request)
     {
         $user_id = 1;
@@ -59,7 +52,7 @@ class WritingController extends Controller
                     $writing = new Writing();
                     $writing->user_id = $user_id;
                     $writing->topic = $topic;
-                    $writing->hash = md5($user_id . 'writing' . Str::random(32));//randome 10 ký tự và unique
+                    $writing->hash = md5($user_id . 'writing' . Str::random(32)); //randome 10 ký tự và unique
                     $writing->response = $response->getBody();
                     $writing->save();
 
@@ -70,16 +63,15 @@ class WritingController extends Controller
                         'request_id' => $writing->id,
                     ]);
 
-
                     // Hiển thị nội dung để kiểm tra
-                        return $this->responseSuccess([
-                        'data' => [
+                    return $this->responseSuccess(null, [
+
                             'body' => $body,
                             'hash' => $writing->hash,
                             //'remaining_accounting_charge' => Auth::user()->getAccountingCharge(),
                             'history' => new HistoryUserEnglishResource($history),
-                        ],
-                    ], 200);
+                    ]);
+       
                 } else {
                     return $this->responseWithCustomError('dịch vụ hiện đang tạm dừng', $body, $statusCode);
                     //dd($body);
@@ -95,7 +87,7 @@ class WritingController extends Controller
                     $statusCode = $e->getCode() ?: 500; // Default to 500 if no code is available
                 }
                 Log::channel('server_error')->error('Lỗi server', $body);
-                return esponse()->json([
+                return response()->json([
                     'statusCode' => $statusCode,
                     'body' => $body,
                 ], 500);
@@ -112,7 +104,7 @@ class WritingController extends Controller
         $validator = Validator::make($request->all(), [
             'instruction' => 'required',
             'submission' => 'required',
-            'hash' => 'required'
+            'hash' => "required_without:instruction"
         ]);
         if ($validator->fails()) {
             return response()->json([
@@ -134,7 +126,6 @@ class WritingController extends Controller
                     'instruction' => $instruction
                 ]);
 
-
                 // Lấy mã trạng thái của response
                 $statusCode = $response->getStatusCode();
 
@@ -155,7 +146,6 @@ class WritingController extends Controller
                         'score' => $score,
                     ]);
 
-
                     // Hiển thị nội dung để kiểm tra
                     return response()->json([
                         'data' => $body,
@@ -164,7 +154,6 @@ class WritingController extends Controller
                     return $this->responseWithCustomError('dịch vụ hiện đang tạm dừng', $body, $statusCode);
                     //dd($body);
                 }
-
             } catch (\Exception $e) {
                 if ($e instanceof \Illuminate\Http\Client\RequestException && $e->response) {
                     // If there's a response, decode its JSON content
@@ -209,4 +198,3 @@ class WritingController extends Controller
         return $this->responseSuccess(null, new WritingRequestResource($writing));
     }
 }
- 
