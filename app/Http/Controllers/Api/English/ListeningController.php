@@ -1,24 +1,24 @@
 <?php
 
 namespace App\Http\Controllers\Api\English;
+
 use App\Http\Controllers\Controller;
 use App\Http\Resources\English\HistoryUserEnglishResource;
 use App\Http\Resources\English\ListeningRequestResource;
-use App\Models\Accounting;
 use App\Models\HistoryUserEnglish;
 use App\Models\Listening;
 use App\Models\ListenMark;
 use essa\APIToolKit\Api\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use DateInterval;
+
 class ListeningController extends Controller
 {
-use ApiResponse;
+    use ApiResponse;
     public function listening()
     {
         set_time_limit(60);
@@ -72,7 +72,7 @@ use ApiResponse;
                             'link' => $listeningLink,
                             'hash' => $listening->hash,
                             'remaining_accounting_charge' => 100,
-                            'history' =>[
+                            'history' => [
                                 'id' => $history->id,
                                 'skill' => $history->skill::DISPLAY_NAME,
                                 'created_at' => $history->created_at->locale('en_US')->diffForHumans(),
@@ -168,58 +168,56 @@ use ApiResponse;
             return $this->responseNotFound(null, 'Không tìm thấy bài nghe');
         }
 
-               return $this->responseSuccess(null,  [
-                'youtube_url' => $listening->youtube_url,
-                'hash' => $listening->hash,
-                'response' => json_decode($listening->response, true),
-            ]);
+        return $this->responseSuccess(null,  [
+            'youtube_url' => $listening->youtube_url,
+            'hash' => $listening->hash,
+            'response' => json_decode($listening->response, true),
+        ]);
     }
-    // public function getlistening(string $query, int $maxResults)
 
+    public function randomListening(Request $request)
+    {
+        $query = $request->query('query');
+        $maxResults = $request->query('maxResults');
+        $apiKey = "AIzaSyBpGs-3YVOo5I1vtbxm0qcpq9b6RdaLsic";
+        $type = "video";
+        $part = "snippet";
+        $maxResults = max(1, min(50, $maxResults));
+        $url = "https://www.googleapis.com/youtube/v3/search?key={$apiKey}&q={$query}&part={$part}&type={$type}&maxResults={$maxResults}";
 
-    public function getlistening(Request $request)
-{
-    $query = $request->query('query');
-    $maxResults = $request->query('maxResults');
-    $apiKey = "AIzaSyBpGs-3YVOo5I1vtbxm0qcpq9b6RdaLsic";
-    $type = "video";
-    $part = "snippet";
-    $maxResults = max(1, min(50, $maxResults));
-    $url = "https://www.googleapis.com/youtube/v3/search?key={$apiKey}&q={$query}&part={$part}&type={$type}&maxResults={$maxResults}";
+        try {
+            $response = Http::get($url);
 
-    try {
-        $response = Http::get($url);
+            if ($response->successful()) {
+                $data = $response->json();
+                $videos = [];
 
-        if ($response->successful()) {
-            $data = $response->json();
-            $videos = [];
+                foreach ($data['items'] as $item) {
+                    $videoId = $item['id']['videoId'];
+                    $videoDetailsUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id={$videoId}&key={$apiKey}";
+                    $videoDetailsResponse = Http::get($videoDetailsUrl);
+                    $videoDetails = $videoDetailsResponse->json()['items'][0];
+                    $duration = $this->parseYouTubeDuration($videoDetails['contentDetails']['duration']);
 
-            foreach ($data['items'] as $item) {
-                $videoId = $item['id']['videoId'];
-                $videoDetailsUrl = "https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id={$videoId}&key={$apiKey}";
-                $videoDetailsResponse = Http::get($videoDetailsUrl);
-                $videoDetails = $videoDetailsResponse->json()['items'][0];
+                    $video = [
+                        'videoLink' => "https://www.youtube.com/watch?v={$videoId}",
+                        'title' => $item['snippet']['title'],
+                        'description' => $item['snippet']['description'],
+                        'thumbnails' => $item['snippet']['thumbnails'],
+                        'duration' => sprintf('%02d:%02d:%02d', $duration['hours'], $duration['minutes'], $duration['seconds']),
+                    ];
 
-                $duration = $this->parseYouTubeDuration($videoDetails['contentDetails']['duration']);
-
-                $video = [
-                    'videoLink' => "https://www.youtube.com/watch?v={$videoId}",
-                    'title' => $item['snippet']['title'],
-                    'description' => $item['snippet']['description'],
-                    'thumbnails' => $item['snippet']['thumbnails'],
-                    'duration' => sprintf('%02d:%02d:%02d', $duration['hours'], $duration['minutes'], $duration['seconds']),
-                ];
-
-                $videos[] = $video;
+                    $videos[] = $video;
+                }
+                return $this->responseSuccess('Get data success', response()->json($videos));
+            } else {
+                return $this->responseServerError(null, 'Server error: ' . $response->status());
             }
-            return $this->responseSuccess('Get data success', response()->json($videos));
+        } catch (\Exception $e) {
+            return $this->responseServerError(null, 'Server error: ' . $e->getMessage());
         }
-    } catch (\Exception $e) {
-        return $this->responseServerError(null, 'Server error: ' . $e->getMessage());
     }
-}
-
-  // public function convert duration for api listening
+    // public function convert duration for api listening
     private function parseYouTubeDuration($duration)
     {
         $interval = new DateInterval($duration);
