@@ -35,11 +35,11 @@ class ListeningController extends Controller
             ], 422);
         } else {
             try {
-                // $englishConfig = config('english.x_api_key');
+                $englishConfig = config('english.x_api_key');
                 $response = Http::withHeaders([
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
-                    'x-api-key' => 'ezcS3JyK7NKCV0DkKwG4hqjy65TGnJ64nBB72qnSkNrxaJ3XAf'
+                    'x-api-key' => $englishConfig
                 ])->timeout(60)->post('https://8150.imta-chatbot.online/gen_quizz', [
                     'id' => (string)$user_id,
                     'url' => $listeningLink,

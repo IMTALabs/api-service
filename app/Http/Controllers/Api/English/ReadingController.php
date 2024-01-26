@@ -40,13 +40,13 @@ class ReadingController extends Controller
                 ],
             ], 422);
         } else {
-            // $englishConfig = config('english.x_api_key');
+            $englishConfig = config('english.x_api_key');
             if ($mode == 'gen_topic') {
                 try {
                     $response1 = Http::withHeaders([
                         'Accept' => '*/*',
                         'Content-Type' => 'application/json',
-                        'x-api-key' => 'ezcS3JyK7NKCV0DkKwG4hqjy65TGnJ64nBB72qnSkNrxaJ3XAf'
+                        'x-api-key' => $englishConfig
                     ])->timeout(120)->post('https://8200.imta-chatbot.online/gen_article', [
                         'id' => (string) $user_id,
                         'topic' => $topic,
@@ -81,7 +81,7 @@ class ReadingController extends Controller
                 $response = Http::withHeaders([
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json',
-                    'x-api-key' => 'ezcS3JyK7NKCV0DkKwG4hqjy65TGnJ64nBB72qnSkNrxaJ3XAf'
+                    'x-api-key' => $englishConfig
                 ])->timeout(120)->post('https://8200.imta-chatbot.online/gen_quizz', [
                     'id' => (string) $user_id,
                     'mode' => 'no_gen_topic',
@@ -165,7 +165,7 @@ class ReadingController extends Controller
     {
         $topic = $request->input('topic') ?? '';
         $user_id = 1;
-        // $englishConfig = config('english.x_api_key');
+        $englishConfig = config('english.x_api_key');
         $validator = Validator::make($request->all(), [
             'topic' => 'required',
         ]);
@@ -180,7 +180,7 @@ class ReadingController extends Controller
                 $response = Http::withHeaders([
                     'Accept' => '*/*',
                     'Content-Type' => 'application/json',
-                    'x-api-key' => 'ezcS3JyK7NKCV0DkKwG4hqjy65TGnJ64nBB72qnSkNrxaJ3XAf'
+                    'x-api-key' => $englishConfig
                 ])->timeout(120)->post('https://8200.imta-chatbot.online/gen_article', [
                     'id' => (string) $user_id,
                     'topic' => $topic,
