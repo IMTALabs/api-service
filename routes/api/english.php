@@ -7,7 +7,6 @@ use App\Http\Controllers\Api\English\ListeningController;
 
 Route::prefix('auth')->group(function () {
     Route::post('get-access-token', [AuthController::class, 'getAccessToken'])->name('english.auth.get-access-token');
-
     Route::prefix('reading')->group(function () {
         Route::get('download', [ReadingController::class, 'download'])->name('english.reading.download');
     });
@@ -19,3 +18,13 @@ Route::prefix('/listening')->name('listening.')->group(function () {
     Route::post('/mark', [ListeningController::class, 'submitListening'])->name('listening.mark');
     Route::get('/{hash}', [ListeningController::class, 'listeningTest'])->name('listening.test');
 });
+
+Route::prefix('reading')->group(function () {
+    Route::post('/gen_topic', [ReadingController::class, 'genTopic'])->name('reading.genTopic');
+    Route::post('', [ReadingController::class, 'reading'])->name('reading.reading');
+    Route::post('/mark', [ReadingController::class, 'submitReading'])->name('reading.submitReading');
+    Route::get('/{hash}', [ReadingController::class, 'readingTest'])->name('reading.readingTest');
+    // Route::get('download', [ReadingController::class, 'download'])->name('english.reading.download');
+});
+
+
