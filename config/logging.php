@@ -126,6 +126,22 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
+
+        'english_api_server_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/english_api_server_error.log'),
+            'level' => 'error',
+            'days' => 14,
+            'replace_placeholders' => true,
+        ],
+
+        'server_error' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/server_error.log'),
+            'level' => 'error',
+            'days' => 14,
+            'replace_placeholders' => true,
+        ],
     ],
 
 ];

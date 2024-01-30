@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\English\Role;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Http\Request;
@@ -26,6 +27,13 @@ class RouteServiceProvider extends ServiceProvider
     {
         RateLimiter::for('api', function (Request $request) {
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
+        RateLimiter::for('english.listening', function (Request $request) {
+            return $request->user()?->role == Role::SUPER_ADMIN
+                ? Limit::none()
+                : Limit::perDay(config('english.listening.gen_quizz_limit'))
+                    ->by($request->user()?->id ?: $request->ip());
         });
 
         $this->routes(function () {

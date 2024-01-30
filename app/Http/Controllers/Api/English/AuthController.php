@@ -3,19 +3,24 @@
 namespace App\Http\Controllers\Api\English;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\English\GetAccessTokenRequest;
-use Essa\APIToolKit\Api\ApiResponse;
+use App\Http\Requests\Api\English\LoginRequest;
+use App\Http\Requests\Api\English\RegisterRequest;
+use App\Http\Resources\English\UserResource;
+use App\Models\User;
+use App\Services\English\UserService;
+use App\Traits\APIResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
-    use ApiResponse;
+    use APIResponse;
 
-    public function getAccessToken(GetAccessTokenRequest $request)
+    public function login(LoginRequest $request)
     {
         $credentials = $request->only(['email', 'password']);
         if (!Auth::attempt($credentials)) {
-            return $this->responseUnAuthenticated('Invalid credentials');
+            return $this->responseUnAuthenticated(__('Invalid credentials'));
         }
 
         $user = Auth::user();
@@ -23,7 +28,39 @@ class AuthController extends Controller
         $token = $user->createToken('english')->plainTextToken;
 
         return $this->responseSuccess(null, [
+            'user' => new UserResource($user),
             'token' => $token,
+        ]);
+    }
+
+    public function register(RegisterRequest $request)
+    {
+        $user = UserService::createNewUser($request->only(['email', 'password']));
+        $token = $user->createToken('english')->plainTextToken;
+
+        return $this->responseSuccess(null, [
+            'user' => new UserResource($user),
+            'token' => $token,
+        ]);
+    }
+
+    public function logout()
+    {
+        Auth::user()->tokens()->delete();
+        Session::flush();
+        Session::regenerate();
+
+        return $this->responseSuccess(__('Logged out successfully'));
+    }
+
+    public function user()
+    {
+        $user = Auth::user();
+        // $token = $user->createToken('english')->plainTextToken;
+
+        return $this->responseSuccess(null, [
+            'user' => new UserResource($user),
+            // 'token' => $token,
         ]);
     }
 }

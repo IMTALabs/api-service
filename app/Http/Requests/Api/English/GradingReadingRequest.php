@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\English;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GetAccessTokenRequest extends FormRequest
+class GradingReadingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,8 @@ class GetAccessTokenRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email',
-            'password' => 'required',
+            'hash' => 'required|string|size:32|exists:english_requests,hash',
+            'submit' => 'required|array',
         ];
     }
 }
