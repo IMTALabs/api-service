@@ -6,6 +6,7 @@ use App\Enums\English\RequestType;
 use App\Enums\English\Skill;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\English\GenReadingTopicRequest;
+use App\Http\Requests\Api\English\GradingReadingRequest;
 use App\Http\Requests\Api\English\ReadingGenerateRequest;
 use App\Http\Resources\English\ReadingRequestResource;
 use App\Models\EnglishRequest;
@@ -124,60 +125,41 @@ class ReadingController extends Controller
         }
     }
 
-    public function submitReading(Request $request)
+    public function grading(GradingReadingRequest $request)
     {
         $hash = $request->input('hash');
         $submit = $request->input('submit');
-        $user_id = 1;
-        $validator = Validator::make(\request()->all(), [
-            'hash' => 'required',
-            'submit' => 'required|array',
-        ]);
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->messages(),
 
-            ], 422);
-        } else {
-            try {
-                $dataFind = Reading::where('hash', $hash)->first();
-                $dataResponse = json_decode($dataFind['response']);
-                $results = collect($dataResponse->form)->map(function ($ques, $key) use ($submit) {
-                    return [
-                        'question' => $ques->question,
-                        'explanation' => $ques->explanation,
-                        'answer' => $ques->answer,
-                        'user_answer' => $submit[$key],
-                        'is_correct' => $submit[$key] == $ques->answer,
-                    ];
-                });
+        try {
+            $dataFind = EnglishRequest::where('hash', $hash)->first();
+            $form = $dataFind->response['form'];
 
-                $point = $results->pluck('is_correct')->filter(fn($is_correct) => $is_correct)->count();
-                $markListening = ListenMark::create([
-                    'user_id' => $user_id,
-                    'skill' => Reading::class,
-                    'request_id' => $dataFind->id,
-                    'mark' => $results,
-                    'score' => $point,
-                ]);
+            $results = collect($form)->map(function ($ques, $key) use ($submit) {
+                return [
+                    'question' => $ques['question'],
+                    'explanation' => $ques['explanation'],
+                    'answer' => $ques['answer'],
+                    'user_answer' => $submit[$key],
+                    'is_correct' => $submit[$key] == $ques['answer'],
+                ];
+            });
 
-                return $this->responseSuccess(null, compact('results', 'point'));
-            } catch (\Exception $e) {
-                if ($e instanceof \Illuminate\Http\Client\RequestException && $e->response) {
-                    // If there's a response, decode its JSON content
-                    $body = $e->response->json();
-                    $statusCode = $e->response->status();
-                } else {
-                    // If there's no response, create a generic error message
-                    $body = ['error' => $e->getMessage()];
-                    $statusCode = $e->getCode() ?: 500; // Default to 500 if no code is available
-                }
-                Log::channel('server_error')->error('Lỗi Server', $body);
-                return response()->json([
-                    'statusCode' => $statusCode,
-                    'body' => $body,
-                ], 500);
-            }
+            $point = $results->pluck('is_correct')->filter(fn($is_correct) => $is_correct)->count();
+
+            EnglishRequest::create([
+                'type' => RequestType::GRADING,
+                'skill' => Skill::READING,
+                'user_id' => Auth::id(),
+                'hash' => md5(time() . Str::random(32)),
+                'response' => ['results' => $results, 'point' => $point],
+                'extra_data' => ['request_hash' => $hash, 'user_submission' => $submit],
+                'completed_at' => now(),
+            ]);
+
+            return $this->responseSuccess(null, compact('results', 'point'));
+        } catch (\Throwable $e) {
+            Log::channel('server_error')->error($e->getMessage(), $e->getTrace());
+            return $this->responseServerError();
         }
     }
 

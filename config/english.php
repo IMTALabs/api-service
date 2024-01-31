@@ -17,6 +17,8 @@ return [
 
     'writing' => [
         'gen_quizz_limit' => env('ENGLISH_WRITING_GEN_QUIZZ_LIMIT', 10),
+        'gen_instruction'=>env('ENGLISH_WRITING_GEN_INSTRUCTION'),
+        'evaluate'=>env('ENGLISH_WRITING_EVALUATE')
     ],
 ];
 

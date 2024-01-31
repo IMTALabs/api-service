@@ -40,15 +40,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('reading')->group(function () {
         Route::post('/gen_topic', [ReadingController::class, 'article'])->name('reading.genTopic');
         Route::post('', [ReadingController::class, 'reading'])->name('reading.reading');
-        Route::post('/mark', [ReadingController::class, 'submitReading'])->name('reading.submitReading');
+        Route::post('/mark', [ReadingController::class, 'grading'])->name('reading.submitReading');
         Route::get('/{hash}', [ReadingController::class, 'readingTest'])->name('reading.readingTest');
         // Route::get('download', [ReadingController::class, 'download'])->name('english.reading.download');
     });
 
     Route::prefix('/writing')->group(function () {
         Route::post('/gen_instruction',
-            [WritingController::class, 'writing_gen_instruction'])->name('english.writing.gen_instruction');
-        Route::post('/evalue', [WritingController::class, 'evalue'])->name('english.writing.evalue');
+            [WritingController::class, 'genInstruction'])->name('english.writing.gen_instruction');
+        Route::post('/evalue', [WritingController::class, 'evaluate'])->name('english.writing.evaluate');
         Route::post('/{hash}', [WritingController::class, 'writingTest'])->name('english.writing.hash');
         Route::get('/randomWriting', [WritingController::class, 'randomWriting'])->name('english.writing.random');
     });

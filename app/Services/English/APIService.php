@@ -89,4 +89,39 @@ class APIService
             }
         });
     }
+
+    public static function genInstruction(mixed $topic)
+    {
+        return Cache::remember(md5($topic), 60 * 60 * 24, function () use ($topic) {
+            $response = APIService::getClient()
+                ->timeout(60)
+                ->post(config('english.writing.gen_instruction') . '/gen_instruction', [
+                    'id' => (string) Auth::id(),
+                    'topic' => $topic,
+                ]);
+            if ($response->ok()) {
+                return ['body' => $response->json()];
+            } else {
+                return ['error' => $response->json()];
+            }
+        });
+    }
+
+    public static function evaluate(string $instruction, string $submission)
+    {
+        return Cache::remember(md5( $instruction . $submission), 60 * 60 * 24, function () use ($instruction , $submission) {
+            $response = APIService::getClient()
+                ->timeout(60)
+                ->post(config('english.writing.evaluate') . '/evaluate', [
+                    'id' => (string) Auth::id(),
+                    'submission' => $submission,
+                    'instruction' => $instruction
+                ]);
+            if ($response->ok()) {
+                return ['body' => $response->json()];
+            } else {
+                return ['error' => $response->json()];
+            }
+        });
+    }
 }
