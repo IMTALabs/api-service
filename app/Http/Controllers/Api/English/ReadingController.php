@@ -10,15 +10,12 @@ use App\Http\Requests\Api\English\GradingReadingRequest;
 use App\Http\Requests\Api\English\ReadingGenerateRequest;
 use App\Http\Resources\English\ReadingRequestResource;
 use App\Models\EnglishRequest;
-use App\Models\ListenMark;
-use App\Models\Reading;
 use App\Services\English\APIService;
 use App\Traits\APIResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use League\CommonMark\CommonMarkConverter;
 
@@ -61,8 +58,11 @@ class ReadingController extends Controller
                 $article = Str::replace('\n', "\n", $article);
                 $convertedArticle = $converter->convert($article);
                 $article = Str::replace("\n", '<br>', $convertedArticle->getContent());
+
+                Auth::user()->withdraw(1);
+
                 return $this->responseSuccess(null, [
-                    'article' => $article,
+                    $article,
                 ]);
             } else {
                 $error = $data['error'];
@@ -104,6 +104,8 @@ class ReadingController extends Controller
                     'completed_at' => now(),
                 ]);
 
+                Auth::user()->withdraw(1);
+
                 return $this->responseSuccess(null, [
                     'body' => [
                         'id' => $body['id'],
@@ -111,7 +113,7 @@ class ReadingController extends Controller
                         'paragraph' => $paragraph,
                     ],
                     'hash' => $hash,
-                    'remaining_accounting_charge' => 0,
+                    'remaining_accounting_charge' => Auth::user()->balance,
                     'history' => [],
                 ]);
             } else {
@@ -165,15 +167,29 @@ class ReadingController extends Controller
 
     public function readingTest(string $hash)
     {
-        $reading = Reading::where('hash', $hash)->first();
+        $reading = EnglishRequest::where('type', RequestType::GENERATING)
+            ->where('skill', Skill::READING)
+            ->where('hash', $hash)
+            ->first();
 
         if (!$reading) {
-            Log::channel('server_error')->error('Không tìm thấy bài đọc', [
+            Log::channel('server_error')->error(__('Reading test not found'), [
                 'hash' => $hash,
             ]);
-            return $this->responseNotFound(null, 'Không tìm thấy bài đọc');
+            return $this->responseNotFound(null, __('Reading test not found'));
         }
-        return $this->responseSuccess(null, new ReadingRequestResource($reading));
+        return $this->responseSuccess(null, $reading);
     }
 
+    public function randomReading()
+    {
+        try {
+            $sampleFile = Storage::get('sample/reading.json');
+            $sample = json_decode($sampleFile, true);
+            return $this->responseSuccess(null, collect($sample)->random(5));
+        } catch (\Throwable $e) {
+            Log::channel('server_error')->error($e->getMessage(), $e->getTrace());
+            return $this->responseServerError();
+        }
+    }
 }

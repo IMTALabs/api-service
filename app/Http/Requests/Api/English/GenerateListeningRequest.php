@@ -22,15 +22,15 @@ class GenerateListeningRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'youtube_url' => 'required|url',
+            'listen_link' => 'required|url',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'youtube_url.required' => __('Youtube url is required'),
-            'youtube_url.url' => __('Youtube url is invalid'),
+            'listen_link.required' => __('Youtube url is required'),
+            'listen_link.url' => __('Youtube url is invalid'),
         ];
     }
 }

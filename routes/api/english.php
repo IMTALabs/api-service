@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\English\AuthController;
+use App\Http\Controllers\Api\English\HomeController;
 use App\Http\Controllers\Api\English\ListeningController;
 use App\Http\Controllers\Api\English\ReadingController;
 use App\Http\Controllers\Api\English\WritingController;
@@ -38,19 +39,21 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::prefix('reading')->group(function () {
-        Route::post('/gen_topic', [ReadingController::class, 'article'])->name('reading.genTopic');
-        Route::post('', [ReadingController::class, 'reading'])->name('reading.reading');
-        Route::post('/mark', [ReadingController::class, 'grading'])->name('reading.submitReading');
-        Route::get('/{hash}', [ReadingController::class, 'readingTest'])->name('reading.readingTest');
-        // Route::get('download', [ReadingController::class, 'download'])->name('english.reading.download');
+        Route::post('gen_topic', [ReadingController::class, 'article'])->name('english.reading.genTopic');
+        Route::post('', [ReadingController::class, 'reading'])->name('english.reading.reading');
+        Route::post('mark', [ReadingController::class, 'grading'])->name('english.reading.submitReading');
+        Route::get('randomReading', [ReadingController::class, 'randomReading'])->name('english.reading.randomReading');
+        Route::get('{hash}', [ReadingController::class, 'readingTest'])->name('english.reading.readingTest');
     });
 
-    Route::prefix('/writing')->group(function () {
-        Route::post('/gen_instruction',
+    Route::prefix('writing')->group(function () {
+        Route::post('gen_instruction',
             [WritingController::class, 'genInstruction'])->name('english.writing.gen_instruction');
-        Route::post('/evalue', [WritingController::class, 'evaluate'])->name('english.writing.evaluate');
-        Route::post('/{hash}', [WritingController::class, 'writingTest'])->name('english.writing.hash');
-        Route::get('/randomWriting', [WritingController::class, 'randomWriting'])->name('english.writing.random');
+        Route::post('evalue', [WritingController::class, 'evaluate'])->name('english.writing.evaluate');
+        Route::get('randomWriting', [WritingController::class, 'randomWriting'])->name('english.writing.random');
+        Route::get('{hash}', [WritingController::class, 'writingTest'])->name('english.writing.hash');
     });
+
+    Route::get('history_user', [HomeController::class, 'history'])->name('english.history');
 });
 

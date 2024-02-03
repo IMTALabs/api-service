@@ -24,7 +24,7 @@ class ListeningController extends Controller
     {
         set_time_limit(120);
 
-        $youtubeUrl = $request->get('youtube_url');
+        $youtubeUrl = $request->get('listen_link');
         $numQuizz = $request->get('num_quizz', 10);
 
         try {
@@ -55,11 +55,13 @@ class ListeningController extends Controller
                     'completed_at' => now(),
                 ]);
 
+                Auth::user()->withdraw(1);
+
                 return $this->responseSuccess(null, [
                     'body' => $response,
                     'link' => $youtubeUrl,
                     'hash' => $hash,
-                    'remaining_accounting_charge' => 0,
+                    'remaining_accounting_charge' => Auth::user()->balance,
                     'history' => [],
                 ]);
             } else {

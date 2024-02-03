@@ -223,9 +223,9 @@ trait APIResponse
             //         'detail' => $details,
             //     ],
             // ],
-            'errors' => [
-                'message' => $details ?? $formattedTitle,
-            ],
+            // 'errors' => [
+            'message' => $details ?? $formattedTitle,
+            // ],
         ];
 
 

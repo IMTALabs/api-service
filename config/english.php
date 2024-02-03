@@ -17,8 +17,12 @@ return [
 
     'writing' => [
         'gen_quizz_limit' => env('ENGLISH_WRITING_GEN_QUIZZ_LIMIT', 10),
-        'gen_instruction'=>env('ENGLISH_WRITING_GEN_INSTRUCTION'),
-        'evaluate'=>env('ENGLISH_WRITING_EVALUATE')
+        'gen_instruction_endpoint'=>env('ENGLISH_WRITING_GEN_INSTRUCTION_ENDPOINT'),
+        'evaluate_endpoint'=>env('ENGLISH_WRITING_EVALUATE_ENDPOINT')
+    ],
+
+    'history' => [
+        'default_limit' => env('ENGLISH_DEFAULT_HISTORY_LIMIT', 5),
     ],
 ];
 

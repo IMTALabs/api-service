@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\English\LoginRequest;
 use App\Http\Requests\Api\English\RegisterRequest;
 use App\Http\Resources\English\UserResource;
-use App\Models\User;
 use App\Services\English\UserService;
 use App\Traits\APIResponse;
 use Illuminate\Support\Facades\Auth;
@@ -29,18 +28,19 @@ class AuthController extends Controller
 
         return $this->responseSuccess(null, [
             'user' => new UserResource($user),
-            'token' => $token,
+            'accessToken' => $token,
         ]);
     }
 
     public function register(RegisterRequest $request)
     {
         $user = UserService::createNewUser($request->only(['email', 'password']));
+        $user->tokens()->delete();
         $token = $user->createToken('english')->plainTextToken;
 
         return $this->responseSuccess(null, [
             'user' => new UserResource($user),
-            'token' => $token,
+            'accessToken' => $token,
         ]);
     }
 
@@ -56,11 +56,7 @@ class AuthController extends Controller
     public function user()
     {
         $user = Auth::user();
-        // $token = $user->createToken('english')->plainTextToken;
 
-        return $this->responseSuccess(null, [
-            'user' => new UserResource($user),
-            // 'token' => $token,
-        ]);
+        return $this->responseSuccess(null, new UserResource($user));
     }
 }

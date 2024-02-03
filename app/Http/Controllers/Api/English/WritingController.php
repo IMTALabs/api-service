@@ -6,21 +6,17 @@ use App\Enums\English\RequestType;
 use App\Enums\English\Skill;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\English\WritingGenInstructionRequest;
-use App\Http\Resources\English\HistoryUserEnglishResource;
 use App\Http\Resources\English\WritingRequestResource;
 use App\Models\EnglishRequest;
-use App\Models\HistoryUserEnglish;
-use App\Models\ListenMark;
 use App\Models\Writing;
 use App\Services\English\APIService;
+use App\Traits\APIResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use App\Traits\APIResponse;
 
 class WritingController extends Controller
 {
@@ -37,7 +33,7 @@ class WritingController extends Controller
                 'user_id' => Auth::id(),
                 'hash' => $hash,
                 'extra_data' => [
-                    'topic' => $topic
+                    'topic' => $topic,
                 ],
             ]);
             $data = APIService::genInstruction($topic);
@@ -100,7 +96,7 @@ class WritingController extends Controller
                 'extra_data' => [
                     'hash' => $hash,
                     'instruction' => $instruction,
-                    'submission' => $submission
+                    'submission' => $submission,
                 ],
             ]);
             $data = APIService::evaluate($instruction, $submission);
@@ -112,8 +108,10 @@ class WritingController extends Controller
                     'response' => $body,
                     'completed_at' => now(),
                 ]);
-                return $this->responseSuccess(null,$body);
 
+                Auth::user()->withdraw(8);
+
+                return $this->responseSuccess(null, $body);
             } else {
                 $error = $data['error'];
                 Log::channel('english_api_server_error')->error('Lỗi API server', $error);
@@ -128,26 +126,30 @@ class WritingController extends Controller
 
     public function randomWriting()
     {
-        $randomTopics = Writing::inRandomOrder()->take(5)->get(['id', 'topic']);
-
-        if ($randomTopics->isEmpty()) {
-            return $this->responseServerError(null, "No topics available.");
-        } else {
-            return $this->responseSuccess("Randomed successfully", ['topics' => $randomTopics]);
+        try {
+            $sampleFile = Storage::get('sample/writing.json');
+            $sample = json_decode($sampleFile, true);
+            return $this->responseSuccess(null, collect($sample)->random(5));
+        } catch (\Throwable $e) {
+            Log::channel('server_error')->error($e->getMessage(), $e->getTrace());
+            return $this->responseServerError();
         }
     }
 
     public function writingTest(string $hash)
     {
-        $writing = Writing::where('hash', $hash)->first();
+        $writing = EnglishRequest::where('type', RequestType::GENERATING)
+            ->where('skill', Skill::WRITING)
+            ->where('hash', $hash)
+            ->first();
 
         if (!$writing) {
-            Log::channel('server_error')->error('Không tìm thấy bài viết', [
+            Log::channel('server_error')->error(__('Writing test not found'), [
                 'hash' => $hash,
             ]);
-            return $this->responseNotFound(null, 'Không tìm thấy bài viết');
+            return $this->responseNotFound(null, __('Writing test not found'));
         }
 
-        return $this->responseSuccess(null, new WritingRequestResource($writing));
+        return $this->responseSuccess(null, $writing);
     }
 }
